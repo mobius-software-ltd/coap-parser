@@ -1,5 +1,7 @@
 package com.mobius.software.coap.tlvcoap;
 
+import java.nio.ByteBuffer;
+
 public class CoapOptionUint extends CoapOptionValue
 {
 	public CoapOptionUint(int type, int length, byte[] value)
@@ -13,10 +15,10 @@ public class CoapOptionUint extends CoapOptionValue
 		return value;
 	}
 
-	public int getIntegerValue()
+	public Long getIntegerValue()
 	{
-		// TODO convert byte array to int
-		return 0;
+		Integer localValue=ByteBuffer.wrap(value).getInt();
+		return localValue.longValue() & 0x00FFFFFFFF;
 	}
 
 }
