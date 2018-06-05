@@ -1,5 +1,7 @@
 package com.mobius.software.coap.parserimpl;
 
+import java.nio.ByteBuffer;
+
 import com.mobius.software.coap.headercoap.CoapCode;
 import com.mobius.software.coap.headercoap.CoapMessage;
 import com.mobius.software.coap.headercoap.CoapType;
@@ -103,9 +105,50 @@ public class CoapParser
 		buf.writeByte(message.getCode().getValue());
 		buf.writeShort(message.getMessageID());
 		buf.writeBytes(message.getToken());
-		for (CoapOption option : message.getOptions())
+		
+		Integer previousDelta = 0;
+        for (CoapOption option : message.getOptions())
 		{
-			buf.writeBytes(option.getValue());
+        	int delta = option.getNumber() - previousDelta;
+            int realDelta = delta;
+            byte[] extraDeltaBytes = new byte[0];
+            if (delta >= 269)
+            {
+                realDelta = 14;
+                short remainingValue = (short)(delta - 269);                
+                extraDeltaBytes = ByteBuffer.allocate(2).putShort(remainingValue).array();
+            }
+            else if (delta >= 13)
+            {
+                realDelta = 13;
+                extraDeltaBytes = new byte[1];
+                extraDeltaBytes[0] = (byte)(delta - 13);
+            }
+
+            int valueLength = option.getValue().length;
+            int realLength = valueLength;
+            byte[] extraLengthBytes = new byte[0];
+            if (valueLength >= 269)
+            {
+                realLength = 14;
+                short remainingValue = (short)(valueLength - 269);
+                extraLengthBytes = ByteBuffer.allocate(2).putShort(remainingValue).array();
+            }
+            else if (valueLength >= 13)
+            {
+                realLength = 13;
+                extraLengthBytes = new byte[1];
+                extraLengthBytes[0] = (byte)(valueLength - 13);
+            }
+
+            buf.writeByte((byte)((realDelta << 4) | (realLength & 0x0F)));
+            if (extraDeltaBytes.length > 0)
+                buf.writeBytes(extraDeltaBytes);
+
+            if (extraLengthBytes.length > 0)
+                buf.writeBytes(extraLengthBytes);
+
+            buf.writeBytes(option.getValue());
 		}
 		buf.writeByte(0xFF);
 		if (message.getPayload() != null)
