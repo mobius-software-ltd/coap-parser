@@ -2,12 +2,13 @@ package com.mobius.software.coap.parser.tlv;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.mobius.software.coap.parser.message.options.CoapOption;
 import com.mobius.software.coap.parser.message.options.CoapOptionType;
+import com.mobius.software.coap.parser.message.options.CoapOptionsComparator;
 import com.mobius.software.coap.parser.message.options.OptionParser;
 
 public class CoapMessage
@@ -186,10 +187,11 @@ public class CoapMessage
 		private byte[] token;
 		private List<CoapOption> options = new ArrayList<>();
 		private byte[] payload;
-
+		private CoapOptionsComparator comparator=new CoapOptionsComparator();
+		
 		public CoapMessage build()
 		{
-			this.options = options.stream().sorted(Comparator.comparing(CoapOption::getNumber)).collect(Collectors.toList());
+			Collections.sort(options,comparator);
 			return new CoapMessage(version, type, code, messageID, token, options, payload);
 		}
 
