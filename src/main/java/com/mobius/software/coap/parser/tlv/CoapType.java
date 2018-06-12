@@ -1,4 +1,4 @@
-package com.mobius.software.coap.headercoap;
+package com.mobius.software.coap.parser.tlv;
 
 import java.util.HashMap;
 import java.util.Map;

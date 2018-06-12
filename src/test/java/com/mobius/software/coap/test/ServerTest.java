@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.mobius.software.coap.headercoap.CoapMessage;
-import com.mobius.software.coap.parserimpl.CoapParser;
+import com.mobius.software.coap.parser.CoapParser;
+import com.mobius.software.coap.parser.tlv.CoapMessage;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
