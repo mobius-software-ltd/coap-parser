@@ -1,4 +1,4 @@
-package com.mobius.software.coap.tlvcoap;
+package com.mobius.software.coap.parser.message.options;
 
 public abstract class CoapOptionValue
 {

@@ -1,10 +1,14 @@
-package com.mobius.software.coap.headercoap;
+package com.mobius.software.coap.parser.tlv;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import com.mobius.software.coap.tlvcoap.CoapOption;
+import com.mobius.software.coap.parser.message.options.CoapOption;
+import com.mobius.software.coap.parser.message.options.CoapOptionType;
+import com.mobius.software.coap.parser.message.options.OptionParser;
 
 public class CoapMessage
 {
@@ -30,6 +34,11 @@ public class CoapMessage
 	public static Builder builder()
 	{
 		return new Builder();
+	}
+
+	public Options options()
+	{
+		return new Options();
 	}
 
 	@Override
@@ -80,7 +89,10 @@ public class CoapMessage
 		else if (!options.equals(other.options))
 			return false;
 		if (!Arrays.equals(payload, other.payload))
-			return false;
+		{
+			if ((payload == null && other.payload.length != 0) || other.payload == null && payload.length != 0)
+				return false;
+		}
 		if (!Arrays.equals(token, other.token))
 			return false;
 		if (type != other.type)
@@ -167,7 +179,7 @@ public class CoapMessage
 
 	public static class Builder
 	{
-		private Integer version;
+		private Integer version = 1;
 		private CoapType type;
 		private CoapCode code;
 		private Integer messageID;
@@ -177,6 +189,7 @@ public class CoapMessage
 
 		public CoapMessage build()
 		{
+			this.options = options.stream().sorted(Comparator.comparing(CoapOption::getNumber)).collect(Collectors.toList());
 			return new CoapMessage(version, type, code, messageID, token, options, payload);
 		}
 
@@ -216,10 +229,132 @@ public class CoapMessage
 			return this;
 		}
 
+		public Builder option(CoapOptionType type, Object value)
+		{
+			this.options.add(OptionParser.encode(type, value));
+			return this;
+		}
+
 		public Builder payload(byte[] payload)
 		{
 			this.payload = payload;
 			return this;
+		}
+	}
+
+	public class Options
+	{
+		public Integer fetchAccept()
+		{
+			Short value = fetchSingleValue(CoapOptionType.ACCEPT, Short.class);
+			return value != null ? value.intValue() : null;
+		}
+
+		public Integer fetchUriPort()
+		{
+			Short value = fetchSingleValue(CoapOptionType.URI_PORT, Short.class);
+			return value != null ? value.intValue() : null;
+		}
+
+		public Integer fetchContentFormat()
+		{
+			Short value = fetchSingleValue(CoapOptionType.CONTENT_FORMAT, Short.class);
+			return value != null ? value.intValue() : null;
+		}
+
+		public Integer fetchMaxAge()
+		{
+			return fetchSingleValue(CoapOptionType.MAX_AGE, Integer.class);
+		}
+
+		public Integer fetchSize1()
+		{
+			return fetchSingleValue(CoapOptionType.SIZE1, Integer.class);
+		}
+
+		public Integer fetchObserve()
+		{
+			return fetchSingleValue(CoapOptionType.OBSERVE, Integer.class);
+		}
+
+		public boolean fetchIfNoneMatch()
+		{
+			return fetchSingleValue(CoapOptionType.IF_NONE_MATCH, byte[].class) != null;
+		}
+
+		public String fetchNodeID()
+		{
+			return fetchSingleValue(CoapOptionType.NODE_ID, String.class);
+		}
+
+		public String fetchIfMatch()
+		{
+			return fetchSingleValue(CoapOptionType.IF_MATCH, String.class);
+		}
+
+		public String fetchUriHost()
+		{
+			return fetchSingleValue(CoapOptionType.URI_HOST, String.class);
+		}
+
+		public String fetchEtag()
+		{
+			return fetchSingleValue(CoapOptionType.ETAG, String.class);
+		}
+
+		public String fetchUriPath()
+		{
+			return fetchSingleValue(CoapOptionType.URI_PATH, String.class);
+		}
+
+		public String fetchLocationPath()
+		{
+			return fetchSingleValue(CoapOptionType.LOCATION_PATH, String.class);
+		}
+
+		public String fetchUriQuery()
+		{
+			return fetchSingleValue(CoapOptionType.URI_QUERY, String.class);
+		}
+
+		public String fetchLocationQuery()
+		{
+			return fetchSingleValue(CoapOptionType.LOCATION_QUERY, String.class);
+		}
+
+		public String fetchProxyScheme()
+		{
+			return fetchSingleValue(CoapOptionType.PROXY_SCHEME, String.class);
+		}
+
+		public String fetchProxyUri()
+		{
+			return fetchSingleValue(CoapOptionType.PROXY_URI, String.class);
+		}
+
+		private <T> T fetchSingleValue(CoapOptionType targetType, Class<T> expectedClazz)
+		{
+			T value = null;
+			if (options != null)
+			{
+				for (CoapOption option : options)
+				{
+					value = fetchOptionValue(targetType, option, expectedClazz);
+					if (value != null)
+						break;
+				}
+			}
+			return value;
+		}
+
+		@SuppressWarnings("unchecked")
+		private <T> T fetchOptionValue(CoapOptionType targetType, CoapOption option, Class<T> expectedClazz)
+		{
+			T value = null;
+			CoapOptionType optionType = CoapOptionType.valueOf(option.getNumber());
+			if (optionType == targetType)
+				value = (T) OptionParser.decode(optionType, option.getValue());
+			return value;
 		}
 	}
 }
