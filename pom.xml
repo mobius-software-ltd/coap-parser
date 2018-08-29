@@ -10,7 +10,7 @@
 
 	<groupId>com.mobius-software.coap</groupId>
 	<artifactId>coap-parser</artifactId>
-	<version>1.0.0.FINAL</version>
+	<version>1.0.0-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
