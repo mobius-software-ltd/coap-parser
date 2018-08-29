@@ -2,17 +2,33 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>com.mobius-software</groupId>
+		<artifactId>mobius-public-parent</artifactId>
+		<version>1.0.5</version>
+	</parent>
+
 	<groupId>com.mobius-software.coap</groupId>
 	<artifactId>coap-parser</artifactId>
 	<version>1.0.0.FINAL</version>
 
-	<name>coap-parser</name>
+	<packaging>jar</packaging>
 
+	<name>coap-parser</name>
+	<description>Mobius COAP PARSER</description>
+	
+	<scm>
+		<url>https://github.com/mobius-software-ltd/coap-parser</url>
+		<connection>scm:git:git://github.com:mobius-software-ltd/coap-parser.git</connection>
+		<developerConnection>scm:git:git@github.com:mobius-software-ltd/coap-parser.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+	
 	<dependencies>
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.0.25.Final</version>
+			<version>4.1.25.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
@@ -43,6 +59,70 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.19.1</version>
+				<configuration>
+					<skipTests>true</skipTests>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.0.0</version>				
+			</plugin>			
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</reporting>
+	
+	<profiles>
+		<profile>
+        <id>src</id>
+	        <build>
+	            <plugins>
+	                <plugin>
+	                    <groupId>org.apache.maven.plugins</groupId>
+	                    <artifactId>maven-source-plugin</artifactId>
+	                    <version>2.1.2</version>
+	                    <executions>
+	                        <execution>
+	                            <id>attach-sources</id>
+	                            <goals>
+	                                <goal>jar-no-fork</goal>
+	                            </goals>
+	                        </execution>
+	                    </executions>
+	                </plugin>
+	            </plugins>
+	        </build>
+    	</profile>
+		<profile>
+	      <id>docs</id>
+	      <build>
+	        <plugins>
+	          <plugin>
+	            <groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-javadoc-plugin</artifactId>
+	            <executions>
+	              <execution>
+	                <id>attach-javadocs</id>
+	                <goals>
+	                  <goal>jar</goal>
+	                </goals>
+	              </execution>
+	            </executions>
+	          </plugin>
+	        </plugins>
+	      </build>
+	    </profile>
+	</profiles>
 </project>
