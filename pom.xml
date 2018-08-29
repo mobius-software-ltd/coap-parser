@@ -9,7 +9,7 @@
 
 	<groupId>com.mobius-software.coap</groupId>
 	<artifactId>coap-parser</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 
 	<packaging>jar</packaging>
 
@@ -20,7 +20,7 @@
 		<url>https://github.com/mobius-software-ltd/coap-parser</url>
 		<connection>scm:git:git://github.com:mobius-software-ltd/coap-parser.git</connection>
 		<developerConnection>scm:git:git@github.com:mobius-software-ltd/coap-parser.git</developerConnection>
-		<tag>coap-parser-1.0.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 	
 	<dependencies>
